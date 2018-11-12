@@ -1,5 +1,5 @@
 import torch.nn as nn
-from .pap import *
+from pap import *
 
 def conv3x3(in_planes, out_planes, stride=1):
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=False)
@@ -45,13 +45,16 @@ class PSEBasicBlock(nn.Module):
     expansion = 1
 
     def __init__(self, inplanes, planes, stride=1, downsample=None, reduction=16):
-        super(SEBasicBlock, self).__init__()
+        super(PSEBasicBlock, self).__init__()
         self.conv1 = conv3x3(inplanes, planes, stride)
         self.bn1 = nn.BatchNorm2d(planes)
+
         self.relu = nn.ReLU(inplace=True)
+
         self.conv2 = conv3x3(planes, planes, 1)
         self.bn2 = nn.BatchNorm2d(planes)
         self.se = PSEModule(planes, reduction)
+
         self.downsample = downsample
         self.stride = stride
 

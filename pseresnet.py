@@ -1,23 +1,27 @@
 import math
 import torch.nn as nn
 from torchvision.models import ResNet
-from .se import *
-from .pap import *
-from .layers import *
+from se import *
+from pap import *
 
 class PSEBottleneck(nn.Module):
     expansion = 4
 
     def __init__(self, inplanes, planes, stride=1, downsample=None, reduction=16):
         super(PSEBottleneck, self).__init__()
+
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
+
         self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
                                padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(planes)
+
         self.conv3 = nn.Conv2d(planes, planes * 4, kernel_size=1, bias=False)
         self.bn3 = nn.BatchNorm2d(planes * 4)
+
         self.relu = nn.ReLU(inplace=True)
+
         self.se = PSELayer(planes * 4, reduction)
         self.downsample = downsample
         self.stride = stride
@@ -51,7 +55,6 @@ def se_resnet18(num_classes):
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
     model = ResNet(PSEBasicBlock, [2, 2, 2, 2], num_classes=num_classes)
-    model.avgpool = nn.AdaptiveConcatPool2d(1)
     return model
 
 
@@ -61,7 +64,6 @@ def se_resnet34(num_classes):
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
     model = ResNet(PSEBasicBlock, [3, 4, 6, 3], num_classes=num_classes)
-    model.avgpool = nn.AdaptiveConcatPool2d(1)
     return model
 
 
@@ -71,7 +73,6 @@ def se_resnet50(num_classes):
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
     model = ResNet(PSEBottleneck, [3, 4, 6, 3], num_classes=num_classes)
-    model.avgpool = nn.AdaptiveConcatPool2d(1)
     return model
 
 
@@ -81,7 +82,6 @@ def se_resnet101(num_classes):
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
     model = ResNet(PSEBottleneck, [3, 4, 23, 3], num_classes=num_classes)
-    model.avgpool = nn.AdaptiveConcatPool2d(1)
     return model
 
 
@@ -91,7 +91,6 @@ def se_resnet152(num_classes):
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
     model = ResNet(PSEBottleneck, [3, 8, 36, 3], num_classes=num_classes)
-    model.avgpool = nn.AdaptiveConcatPool2d(1)
     return model
 
 
@@ -137,7 +136,7 @@ class CifarSEResNet(nn.Module):
         self.layer1 = self._make_layer(block, 16, blocks=n_size, stride=1, reduction=reduction)
         self.layer2 = self._make_layer(block, 32, blocks=n_size, stride=2, reduction=reduction)
         self.layer3 = self._make_layer(block, 64, blocks=n_size, stride=2, reduction=reduction)
-        self.avgpool = nn.AdaptiveConcatPool2d(1)
+        self.avgpool = AdaptiveConcatPool2d(1)
         self.fc = nn.Linear(64, num_classes)
         self.initialize()
 
