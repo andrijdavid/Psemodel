@@ -4,7 +4,6 @@ from .pap import *
 from typing import Any, AnyStr, Callable, Collection, Dict, Hashable, Iterator, List, Mapping, NewType, Optional
 from .layers import *
 
-
 def conv_layer(ni:int, nf:int, ks:int=3, stride:int=1)->nn.Sequential:
     "Create Conv2d->BatchNorm2d->LeakyReLu layer: `ni` input, `nf` out filters, `ks` kernel, `stride`:stride."
     return nn.Sequential(
@@ -31,5 +30,5 @@ class Darknet(nn.Module):
 
     def forward(self, x): return self.layers(x)
 
-def dark_small(num_classes, ch_in=3): return Darknet([1,2,4,4,3], num_classes, ch_in, 32)
-def dark_53(num_classes, ch_in=3): return Darknet([1,2,8,8,4], num_classes, ch_in, 32)
+def dark_small(num_classes, ch_in=3): return Darknet([1,2,4,4,3], num_classes,  nf=32, ch_in=ch_in)
+def dark_53(num_classes, ch_in=3): return Darknet([1,2,8,8,4], num_classes,  nf=32, ch_in=ch_in)
